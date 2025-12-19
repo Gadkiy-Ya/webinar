@@ -240,12 +240,11 @@ def get_suffix(count):
 
 def load_participants_from_file(filename: str) -> List[Participant]:
     """Загружает список участников из файла"""
-    full_filename = filename + '.txt'
     try:
-        with open(full_filename, 'r', encoding='utf-8') as f:
+        with open(filename, 'r', encoding='utf-8') as f:
             return [Participant(*line.strip().split(maxsplit=1)) for line in f if line.strip()]
     except FileNotFoundError:
-        print(f"Ошибка: файл {full_filename} не найден")
+        print(f"Ошибка: файл {filename} не найден")
         return []
     except Exception as e:
         print(f"Ошибка при чтении файла: {e}")
@@ -282,44 +281,15 @@ def get_output_filename() -> str:
         return filename
 
 
-def print_participants_list(participants: List[Participant]):
-    """Выводит список участников"""
-    if not participants:
-        print("Список участников пуст")
-        return
-    print("\n=== Участники ===")
-    for participant in sorted(participants, key=lambda x: x.last_name):
-        print(participant.full_name)
-
-def delete_participant(participants: List[Participant]):
-    print("\n=== Участники ===")
-    for i, participant in enumerate(participants, 1):
-        print(f"{i}. {participant.full_name}")
-    while True:
-        try:
-            choice = int(input("\nВведите номер участника, которого нужно удалить: "))
-            if 1 <= choice <= len(participants):
-                participants.pop(choice - 1)
-                break
-            else:
-                print("Ошибка: неверный номер участника")
-        except ValueError:
-            print("Ошибка: введите число")
-
-
 def main():
-    participants = []
     print("\n=== Вебинарный распределитель ролей ===")
 
     # Выбор способа ввода участников
     while True:
-        choice = input("\nВыберите действие:\n"
-                       "1 - Загрузить список участников из файла\n"
-                       "2 - Ввести участников вручную\n"
-                       "3 - Показать список участников\n"
-                       "4 - Удалить участника из списка\n"
-                       "5 - Распределить роли\n"
-                       "Ваш выбор (1/2/3/4/5): ").strip()
+        choice = input("\nВыберите способ ввода участников:\n"
+                       "1 - Загрузить из файла\n"
+                       "2 - Ввести вручную\n"
+                       "Ваш выбор (1/2): ").strip()
         
         if choice == '1':
             filename = input("Введите имя файла: ").strip()
@@ -330,12 +300,6 @@ def main():
             participants = manual_input_participants()
             if participants:
                 break
-        elif choice == '3':
-            print_participants_list(participants)
-        elif choice == '4':
-            delete_participant(participants)
-        elif choice == '5':
-            break
         else:
             print("\nНекорректный ввод, попробуйте еще раз")
 
