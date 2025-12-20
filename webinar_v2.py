@@ -14,7 +14,8 @@ class Participant:
 
 class WebinarRoleDistributor:
     def __init__(self, participants: List[Participant]):
-        self.participants = participants.copy()
+        # self.participants = participants.copy()
+        self.participants = participants
         self.rounds: List[Dict] = []
         self.current_round = 0
         self.next_speaker: Optional[Participant] = None
@@ -28,6 +29,7 @@ class WebinarRoleDistributor:
 
     def delete_participant(self, participant: Participant):
         if participant in self.participants:
+            print(f"Удаляем участника {participant.first_name} {participant.last_name}")
             self.participants.remove(participant)
             print(f"Участник {participant.first_name} {participant.last_name} удален из списка")
         else:
@@ -244,9 +246,12 @@ def get_suffix(count):
 
 def load_participants_from_file(filename: str) -> List[Participant]:
     """Загружает список участников из файла"""
+    filename = filename + '.txt'
+    print(f"\n=== Загрузка участников из файла: {filename} ===")
     try:
         with open(filename, 'r', encoding='utf-8') as f:
             return [Participant(*line.strip().split(maxsplit=1)) for line in f if line.strip()]
+        print(f"\n=== Загрузка участников из файла: {filename} завершена ===")
     except FileNotFoundError:
         print(f"Ошибка: файл {filename} не найден")
         return []
@@ -284,26 +289,72 @@ def get_output_filename() -> str:
             filename += '.txt'
         return filename
 
+def distribute_roles(participants: List[Participant]):
+    print("\n=== Распределение ролей ===")
+    print("\nВсего участников:", len(participants))
+    print(f"Количество наблюдателей в раунде: {2 if len(participants) >= 15 else 1}")
+    distributor = WebinarRoleDistributor(participants)
+   
+    if distributor.distribute_roles():
+        print("\nРезультаты распределения ролей:")
+        distributor.print_rounds()
+        
+        # Сохранение в файл
+        filename = get_output_filename()
+        if filename:
+            distributor.save_to_file(filename)
+            print(f"\nРезультаты сохранены в файл: {filename}")
+    else:
+        print("\nНе удалось распределить роли")
+
+    
+def print_participants_list(participants: List[Participant]):
+    if not participants:
+        print("\n=== Список участников пуст ===")
+        return
+    print("\n=== Список участников ===")
+    for i, participant in enumerate(participants, start=1):
+        print(f"{i}. {participant.first_name} {participant.last_name}")
+
+def delete_participant(participants: List[Participant]):
+    distributor = WebinarRoleDistributor(participants)
+    print("\n=== Удаление участника ===")
+    participant_index = int(input("Введите номер участника для удаления: ")) - 1
+    if 0 <= participant_index < len(participants):
+        distributor.delete_participant(participants[participant_index])
+    else:
+        print("Ошибка: неверный номер участника")
+
 
 def main():
     print("\n=== Вебинарный распределитель ролей ===")
-
+    participants = []
     # Выбор способа ввода участников
     while True:
         choice = input("\nВыберите способ ввода участников:\n"
                        "1 - Загрузить из файла\n"
                        "2 - Ввести вручную\n"
-                       "Ваш выбор (1/2): ").strip()
+                       "3 - Показать список участников\n"
+                       "4 - Удалить участника из списка\n"
+                       "5 - Распределить роли\n"
+                       "Ваш выбор (1/2/3/4/5): ").strip()
         
         if choice == '1':
             filename = input("Введите имя файла: ").strip()
             participants = load_participants_from_file(filename)
-            if participants:
-                break
+            # if participants:
+            #     break
         elif choice == '2':
             participants = manual_input_participants()
-            if participants:
-                break
+            # if participants:
+            #     break
+        elif choice == '3':
+            print_participants_list(participants)
+        elif choice == '4':
+            delete_participant(participants)
+        elif choice == '5':
+            distribute_roles(participants)
+            break
         else:
             print("\nНекорректный ввод, попробуйте еще раз")
 
@@ -316,22 +367,22 @@ def main():
         return
 
     # Распределение ролей
-    print(f"\nВсего участников: {len(participants)}")
-    print(f"Количество наблюдателей в раунде: {2 if len(participants) >= 15 else 1}")
+    # print(f"\nВсего участников: {len(participants)}")
+    # print(f"Количество наблюдателей в раунде: {2 if len(participants) >= 15 else 1}")
 
-    distributor = WebinarRoleDistributor(participants)
+    # distributor = WebinarRoleDistributor(participants)
 
-    if distributor.distribute_roles():
-        print("\nРезультаты распределения ролей:")
-        distributor.print_rounds()
+    # if distributor.distribute_roles():
+    #     print("\nРезультаты распределения ролей:")
+    #     distributor.print_rounds()
         
-        # Сохранение в файл
-        filename = get_output_filename()
-        if filename:
-            distributor.save_to_file(filename)
-            print(f"\nРезультаты сохранены в файл: {filename}")
-    else:
-        print("\nНе удалось распределить роли")
+    #     # Сохранение в файл
+    #     filename = get_output_filename()
+    #     if filename:
+    #         distributor.save_to_file(filename)
+    #         print(f"\nРезультаты сохранены в файл: {filename}")
+    # else:
+    #     print("\nНе удалось распределить роли")
 
 
 if __name__ == "__main__":
