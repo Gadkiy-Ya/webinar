@@ -1,4 +1,5 @@
 import random
+import sys
 from typing import List, Dict, Optional
 # from dataclasses import dataclass
 
@@ -337,7 +338,8 @@ def main():
                        "3 - Показать список участников\n"
                        "4 - Удалить участника из списка\n"
                        "5 - Распределить роли\n"
-                       "Ваш выбор (1/2/3/4/5): ").strip()
+                       "6 - Выход\n"
+                       "Ваш выбор (1/2/3/4/5/6): ").strip()
         
         if choice == '1':
             filename = input("Введите имя файла: ").strip()
@@ -355,6 +357,8 @@ def main():
         elif choice == '5':
             distribute_roles(participants)
             break
+        elif choice == '6':
+            sys.exit()
         else:
             print("\nНекорректный ввод, попробуйте еще раз")
 

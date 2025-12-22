@@ -240,11 +240,12 @@ def get_suffix(count):
 
 def load_participants_from_file(filename: str) -> List[Participant]:
     """Загружает список участников из файла"""
+    full_filename = filename + ".txt"
     try:
-        with open(filename, 'r', encoding='utf-8') as f:
+        with open(full_filename, 'r', encoding='utf-8') as f:
             return [Participant(*line.strip().split(maxsplit=1)) for line in f if line.strip()]
     except FileNotFoundError:
-        print(f"Ошибка: файл {filename} не найден")
+        print(f"Ошибка: файл {full_filename} не найден")
         return []
     except Exception as e:
         print(f"Ошибка при чтении файла: {e}")
@@ -287,12 +288,12 @@ def main():
     # Выбор способа ввода участников
     while True:
         choice = input("\nВыберите способ ввода участников:\n"
-                       "1 - Загрузить из файла\n"
+                       "1 - Загрузить из файла .txt\n"
                        "2 - Ввести вручную\n"
                        "Ваш выбор (1/2): ").strip()
         
         if choice == '1':
-            filename = input("Введите имя файла: ").strip()
+            filename = input("Введите имя файла без расширения: ").strip()
             participants = load_participants_from_file(filename)
             if participants:
                 break
